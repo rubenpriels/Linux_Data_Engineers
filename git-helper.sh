@@ -69,74 +69,24 @@ check_basic_settings() {
     username=$(git config --global user.name || echo "")
     email=$(git config --global user.email || echo "")
     pushdefault=$(git config --global push.default || echo "")
+    # echo "${username}"
+    # echo "${email}"
+    # echo "${pushdefault}"
 
     if [ -z "$username" ]; then
-         boolean=ask_to_change "user.name"
-         if [ "$1" -eq 0 ]; then
-          ask_config_value "user.name"
-         else
-          echo "user.name not set. Please set it manually."
-#        echo "Git username not set. Set it using 'git config --global user.name \"Your Name\"'" >&2
-         fi
+        echo "Git username not set. Set it using 'git config --global user.name \"Your Name\"'" >&2
     fi
     if [ -z "$email" ]; then
-         boolean=ask_to_change "user.email"
-         if [ "$1" -eq 0 ]; then
-          ask_config_value "user.email"
-         else
-          echo "user.email not set. Please set it manually."
-#        echo "Git username not set. Set it using 'git config --global user.name \"Your Name\"'" >&2
-         fi
-#        echo "Git email not set. Set it using 'git config --global user.email \"you@example.com\"'" >&2
+        echo "Git email not set. Set it using 'git config --global user.email \"you@example.com\"'" >&2
     fi
     if [ -z "$pushdefault" ]; then
-         boolean=ask_to_change "push.default"
-         if [ "$1" -eq 0 ]; then
-          ask_config_value "push.default"
-         else
-          echo "push.default not set. Please set it manually."
-#        echo "Git username not set. Set it using 'git config --global user.name \"Your Name\"'" >&2
-         fi
-
-#        echo "Git push.default not set. Set it using 'git config --global push.default simple'" >&2
+        echo "Git push.default not set. Set it using 'git config --global push.default simple'" >&2
     fi
 
     if [ -n "${arg2}" ]; then
         check_repo
     fi
-
 }
-
-# CR-02
-ask_to_change() {
-   read -p "${1} not set. Do you want to set it now? [Y/n]" response
-   response=$(response,,)
-   if "${response} == y || ${response} == yes || ${response} == "" " ; then
-           return 0
-   else
-           return 1
-   fi
-
-}
-
-# CR-03
-ask_config_value() {
-   read -p "Enter default value for ${1}" response
-   if "${1} == user.name"; then
-        git config --global user.name "${response}"
-
-    fi
-    if "${1} == user.email"; then
-        git config --global user.email "${response}"
-
-    fi
-    if "${1} == push.default"; then
-        git config --global push.default "${response}"
-    fi
-
-}
-
-
 
 # Usage: check_repo DIR
 #  Perform some checks on the specified DIR that should contain a Git
@@ -152,13 +102,6 @@ check_repo() {
     for file in "${required_files[@]}"; do
         if [ ! -f "${DIRECTORY}"/"${file}" ]; then
             echo "Missing '${file}'" >&2
-            if "${file} == README.md"; then # CR-07
-                touch "${DIRECTORY}"/"${file}"
-                echo "# ${DIRECTORY} \n \n" >> "${DIRECTORY}/README.md"
-                echo "This is the README for ${DIRECTORY} \n" >> "${DIRECTORY}/README.md"
-                git add .
-                git commit -m "README toegevoegd"
-            fi
         fi
     done
 
@@ -200,19 +143,13 @@ check_repo() {
 #  Show git log in the specified DIR or in the current directory if none was
 #  specified.
 show_history() {
-    # CR-08
-    if [ -z "${2}" ]; then
     git log --pretty=format:"%s | %an | %ad" --date=format:"%Y/%m/%d"
-    else
-    git log -n "${2}" --pretty=format:"%s | %an | %ad" --date=format:"%Y/%m/%d"
-    fi
 }
 
 # Usage: stats [DIR]
 #  Show the number of commits and the number of contributors in the specified
 #  DIR or in the current directory if none was specified.
 stats() {
-
     local commit_count contributor_count
 
     commit_count=$(git rev-list --count HEAD)
@@ -224,7 +161,6 @@ stats() {
 # Usage: undo_last_commit
 #  Undo the last commit but keep local changes in the working directory.
 undo_last_commit() {
-
     local last_commit_message
     last_commit_message=$(git log -1 --pretty=%s)
     git reset --soft HEAD~1
@@ -275,14 +211,12 @@ Usage: Git-helper COMMAND [ARGUMENTS]...
 Commands:
     check         Check basic git user configuration and option to fill them if requested
     check DIR     Check basic git user configuration and option to fill them if requested and check DIR for deviations of standard git practices
-    log [N]       Display a brief overview of the git log of the PWD
+    log           Display a brief overview of the git log of the PWD
     stats         Display some brief stats about the PWD repository
     undo          Undo last commit from git working tree while preserving local changes
     sync          Sync local branch with remote
-    help          Show this help message
 EOF
     exit 0
 }
 
 main "${@}"
-
