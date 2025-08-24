@@ -209,9 +209,9 @@ usage() {
 Usage: Git-helper COMMAND [ARGUMENTS]...
 
 Commands:
-    check         Check basic git user configuration and option to fill them if requested
-    check DIR     Check basic git user configuration and option to fill them if requested and check DIR for deviations of standard git practices
-    log           Display a brief overview of the git log of the PWD
+    check         Check basic git user configuration
+    check DIR     check basic git user configuration and check DIR for deviations of standard git practices
+    log           display a brief overview of the git log of the PWD
     stats         Display some brief stats about the PWD repository
     undo          Undo last commit from git working tree while preserving local changes
     sync          Sync local branch with remote
